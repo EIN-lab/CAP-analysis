@@ -19,6 +19,13 @@ chToLoad = 2;
 % user will be prompted to select the baseline and area regions
 dataCAP_glucose = analyse_CAP(dirData, fnMCD_glucose, pathDLL, chToLoad);
 
+% Call the function to find the peak latencies
+% sweepsToUse_glucose = 100:120;
+sweepsToUse_glucose = 10:30;
+fnBase_glucose = fullfile(dirData, fnMCD_glucose);
+dataPeaks_glucose = analyse_CAP_peaks(dataCAP_glucose, ...
+    fnBase_glucose, sweepsToUse_glucose);
+
 % For the next datasets, we can use the baseline and area regions from the
 % first data set.  So, we extract these here for convenience.
 edgesBaseline = dataCAP_glucose.edges_baseline;
@@ -31,3 +38,4 @@ dataCAP_ramp2 = analyse_CAP(dirData, fnMCD_ramp2, pathDLL, chToLoad, ...
     edgesBaseline, edgesArea);
 dataCAP_ramp3 = analyse_CAP(dirData, fnMCD_ramp3, pathDLL, chToLoad, ...
     edgesBaseline, edgesArea);
+

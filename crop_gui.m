@@ -1,10 +1,17 @@
-function idxToUse = crop_gui(tt, vv, strBoundary)
+function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
 
     % Specify how many points to choose
     nPoints = 2;
+    if nargin > 3
+        nPoints = varargin{1};
+    end
+    
+    strLRTB = 'LEFT and RIGHT';
+    if nargin > 4
+        strLRTB =  varargin{2};
+    end
 
     % Set up the information messages etc
-    strLRTB = 'LEFT and RIGHT';
     strFigTitleTop = sprintf('Select the %s %s boundaries', ...
         strLRTB, strBoundary);
     strMsg = 'Click outside the image to use all the way to that edge.';
@@ -15,15 +22,9 @@ function idxToUse = crop_gui(tt, vv, strBoundary)
 
     % Create the figure
     hFig = figure;
-    yMax = max(vv(:));
-    yMin = min(vv(:));
-    yRange = yMax - yMin;
-    yLimFrac = 0.05;
-    yLims = [yMin-yLimFrac*yRange, yMax+yLimFrac*yRange];
-    plot(tt, vv)
+    yLims = plot_traces(tt, vv);
     hold on
     title(strFigTitle)
-    ylim(yLims)
     hold off
 
     % Preallocate memory
