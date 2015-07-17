@@ -130,7 +130,7 @@ fitOptions = fitoptions(modelName, 'StartPoint', pp0);
 
 % Preallocate memory for variables
 data.area_CAP = zeros(nSweeps, 1);
-data.peak_time_raw = nan(nSweeps, 2);
+data.peak_time_raw = zeros(nSweeps, 2);
 data.peak_height_raw = data.peak_time_raw;
 data.edge_fit = data.area_CAP;
 data.peak_time_fit = zeros(nSweeps, 3);
@@ -150,29 +150,48 @@ for iSweep = 1:nSweeps
     data.area_CAP(iSweep) = trapz(data.tt(idxToUseArea), ...
         abs(data.data_sweeps(idxToUseArea, iSweep)));
     
-    % Find the 'raw' peaks for each CAP
-    [peakHeightTemp, peakLocsRaw] = findpeaks(...
-        data.data_sweeps(idxToUseArea, iSweep), ...
-        'MinPeakProminence', data.min_prominence);
-    nPeaks = length(peakLocsRaw);
-    if nPeaks > 0
-        nPeaks = min([nPeaks, 2]);
-        peakLocsAdj = data.edges_area(1) + peakLocsRaw - 1;
-        data.peak_time_raw(iSweep, 1:nPeaks) = ...
-            data.tt(peakLocsAdj(1:nPeaks));
-        data.peak_height_raw(iSweep, 1:nPeaks) = peakHeightTemp(1:nPeaks);
-    end
-    
     if doFit
+    
+        % Find the 'raw' peaks for each CAP
+        [peakHeightTemp, peakLocsRaw] = findpeaks(...
+            data.data_sweeps(idxToUseArea, iSweep), ...
+            'MinPeakProminence', data.min_prominence);
+        nPeaks = length(peakLocsRaw);
+        if nPeaks > 0
+            nPeaks = min([nPeaks, 2]);
+            peakLocsAdj = data.edges_area(1) + peakLocsRaw - 1;
+            data.peak_time_raw(iSweep, 1:nPeaks) = ...
+                data.tt(peakLocsAdj(1:nPeaks));
+            data.peak_height_raw(iSweep, 1:nPeaks) = peakHeightTemp(1:nPeaks);
+        else
+            warning('AnalyseCAP:NoPeaks', ['No peaks found in sweep %d :-( . ' ...
+                'This may influence the fitting process.'], iSweep)
+        end
     
         % Figure out where to end the gaussian fit (when the peak first 
         % drops below a threshold value mV
-        data.edge_fit(iSweep) = find(...
-            data.data_sweeps(data.edges_area(1):end, iSweep) < ...
+        hasPeak2 = data.peak_time_raw(iSweep, 2) > 0;
+        if hasPeak2
+            idxPeakStart = peakLocsAdj(2);
+        else
+            idxPeakStart = data.edges_area(1);
+        end
+        idxGaussEnd = find(data.data_sweeps(idxPeakStart:end, iSweep) < ...
             data.thresh_end_gauss, 1, 'first');
-
+        
+        % Check that we have enough points
+        minNPoints = 30;
+        hasEnoughPoints = idxGaussEnd > minNPoints;
+        if ~hasEnoughPoints
+            warning('AnalyseCAP:NotEnoughPoints', ['There were less ' ...
+                'than %d points found for the fitting.  Something ' ...
+                'weird is probably happening.  Try looking at the ' ...
+                'traces, or else see Matt.'], minNPoints)
+        end
+        
         % Fit a sum of 3 gaussians to the curve
-        idxToUseFit = (1:data.edge_fit) + data.edges_area(1) - 1;
+        idxToUseFit = (1:idxGaussEnd) + idxPeakStart - 1;
+        data.edge_fit(iSweep) = idxToUseFit(end);
         [data.fit_object{iSweep}, gof] = fit(...
             data.tt(idxToUseFit), data.data_sweeps(idxToUseFit, iSweep), ...
             modelName, fitOptions);
