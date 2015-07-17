@@ -46,7 +46,7 @@ dataCAP_ramp3 = analyse_CAP(dirData_glucose, fnMCD_ramp3, ...
     pathDLL, chToLoad_glucose, ...
     edgesBaseline, edgesArea);
 
-%% HFS protocol example
+%% HFS protocol example 1
 
 % Specify the filenames of the MCD files
 fnMCD_HFS = '2015_07_16_N2689_HFS0001.mcd';
@@ -58,7 +58,23 @@ dirData_HFS = 'F:\Data\Optic Nerve Analysis\Dataset 2';
 chToLoad_HFS = 10;
 
 % Call the function to analyse the data sets, this time with fitting
-doFit = true;
-dataCAP_HFS = analyse_CAP(dirData_HFS, fnMCD_HFS, ...
-    pathDLL, chToLoad_HFS, [], [], doFit);
+doFit1 = true;
+dataCAP_HFS1 = analyse_CAP(dirData_HFS, fnMCD_HFS, ...
+    pathDLL, chToLoad_HFS, [], [], doFit1);
+
+%% HFS protocol example 2
+
+% Specify the filenames of the MCD files
+fnMCD_HFS2 = '2015_07_17_N2690_HFS0001.mcd';
+
+% Specify the directory of the MCD files
+dirData_HFS2 = 'F:\Data\Optic Nerve Analysis\Dataset 3';
+
+% Specify which of the 'segment' channels to load
+chToLoad_HFS2 = 10;
+
+% Call the function to analyse the data sets, this time with fitting
+doFit2 = true;
+dataCAP_HFS2 = analyse_CAP(dirData_HFS2, fnMCD_HFS2, ...
+    pathDLL, chToLoad_HFS2, [], [], doFit2);
 
