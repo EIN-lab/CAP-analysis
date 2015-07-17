@@ -24,7 +24,7 @@ if nargin > 6
     doFit = varargin{3};
 end
 
-data.min_prominence = 0.5;
+data.min_prominence = 0.25;
 if nargin > 7
     data.min_prominence = varargin{4};
 end
@@ -174,7 +174,7 @@ for iSweep = 1:nSweeps
         if hasPeak2
             idxPeakStart = peakLocsAdj(2);
         else
-            idxPeakStart = data.edges_area(1);
+            idxPeakStart = find(data.tt > 2.5, 1,  'first');
         end
         idxGaussEnd = find(data.data_sweeps(idxPeakStart:end, iSweep) < ...
             data.thresh_end_gauss, 1, 'first');
