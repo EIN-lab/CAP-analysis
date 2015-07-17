@@ -26,12 +26,8 @@ end
 % Extract the time vector
 tt = dataCAP.tt;
 
-% Extract the baseline values
-vv0 = dataCAP.baseline(sweepsToUse);
-
 % Create an average trace
-vv = mean(bsxfun(@minus, ...
-    dataCAP.data_sweeps(:, sweepsToUse), vv0), 2);
+vv = mean(dataCAP.data_sweeps(:, sweepsToUse), 2);
 
 % Figure out which times to use for the fitting
 strLabel = 'gaussian fitting';
@@ -127,9 +123,6 @@ legend('boxoff')
 % Save the figures
 save_fig(hFig_raw, fnBase, '_peaks_raw')
 save_fig(hFig_fitted, fnBase, '_peaks_fitted')
-
-
-
 
 end
 

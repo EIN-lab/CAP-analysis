@@ -19,7 +19,7 @@ function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
     
     % Work out the data spacing
     ttSpacing = mean(tt(2:end) - tt(1:end-1));
-
+    
     % Create the figure
     hFig = figure;
     yLims = plot_traces(tt, vv);

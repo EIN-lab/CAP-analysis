@@ -1,5 +1,9 @@
 function varargout = plot_traces(tt, vv)
 
+% Setup the color values for the 
+nSweeps = size(vv, 2);
+colorVals = parula(nSweeps);
+
 % Maximize the figure
 set(gcf,'units','normalized','outerposition',[0 0 1 1])
 
@@ -9,7 +13,11 @@ yMin = min(vv(:));
 yRange = yMax - yMin;
 yLimFrac = 0.05;
 yLims = [yMin-yLimFrac*yRange, yMax+yLimFrac*yRange];
-plot(tt, vv)
+hold on
+for iSweep = 1:nSweeps
+    plot(tt, vv(:, iSweep), 'Color', colorVals(iSweep, :))
+end
+hold off
 ylim(yLims)
 
 % Pass the output argument
