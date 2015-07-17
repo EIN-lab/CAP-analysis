@@ -2,7 +2,7 @@ function varargout = plot_traces(tt, vv)
 
 % Setup the color values for the 
 nSweeps = size(vv, 2);
-colorVals = parula(nSweeps);
+colorVals = jet(nSweeps);
 
 % Maximize the figure
 set(gcf,'units','normalized','outerposition',[0 0 1 1])
