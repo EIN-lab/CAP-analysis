@@ -21,7 +21,8 @@ chToLoad_glucose = 2;
 
 % Call the function to analyse the data sets.  For the first data set, the
 % user will be prompted to select the baseline and area regions
-dataCAP_glucose = analyse_CAP(dirData_glucose, fnMCD_glucose, pathDLL, chToLoad_glucose);
+dataCAP_glucose = analyse_CAP(dirData_glucose, fnMCD_glucose, ...
+    pathDLL, chToLoad_glucose);
 
 % Call the function to find the peak latencies
 sweepsToUse_glucose = 10:30;
@@ -35,11 +36,14 @@ edgesBaseline = dataCAP_glucose.edges_baseline;
 edgesArea = dataCAP_glucose.edges_area;
 
 % Call the function to analyse the remaining data sets
-dataCAP_ramp1 = analyse_CAP(dirData_glucose, fnMCD_ramp1, pathDLL, chToLoad_glucose, ...
+dataCAP_ramp1 = analyse_CAP(dirData_glucose, fnMCD_ramp1, ...
+    pathDLL, chToLoad_glucose, ...
     edgesBaseline, edgesArea);
-dataCAP_ramp2 = analyse_CAP(dirData_glucose, fnMCD_ramp2, pathDLL, chToLoad_glucose, ...
+dataCAP_ramp2 = analyse_CAP(dirData_glucose, fnMCD_ramp2, ...
+    pathDLL, chToLoad_glucose, ...
     edgesBaseline, edgesArea);
-dataCAP_ramp3 = analyse_CAP(dirData_glucose, fnMCD_ramp3, pathDLL, chToLoad_glucose, ...
+dataCAP_ramp3 = analyse_CAP(dirData_glucose, fnMCD_ramp3, ...
+    pathDLL, chToLoad_glucose, ...
     edgesBaseline, edgesArea);
 
 %% HFS protocol example
@@ -53,7 +57,8 @@ dirData_HFS = 'F:\Data\Optic Nerve Analysis\Dataset 2';
 % Specify which of the 'segment' channels to load
 chToLoad_HFS = 10;
 
-% Call the function to analyse the data sets.  For the first data set, the
-% user will be prompted to select the baseline and area regions
-dataCAP_HFS = analyse_CAP(dirData_HFS, fnMCD_HFS, pathDLL, chToLoad_HFS);
+% Call the function to analyse the data sets, this time with fitting
+doFit = true;
+dataCAP_HFS = analyse_CAP(dirData_HFS, fnMCD_HFS, ...
+    pathDLL, chToLoad_HFS, [], [], doFit);
 

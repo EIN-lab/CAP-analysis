@@ -19,14 +19,19 @@ if nargin > 5
     data.edges_area = varargin{2};
 end
 
+doFit = false;
+if nargin > 6
+    doFit = varargin{3};
+end
+
 data.min_prominence = 0.5;
-if nargin > 5
-    data.min_prominence = varargin{3};
+if nargin > 7
+    data.min_prominence = varargin{4};
 end
 
 data.thresh_end_gauss = 0.75;
-if nargin > 5
-    data.thresh_end_gauss = varargin{4};
+if nargin > 8
+    data.thresh_end_gauss = varargin{5};
 end
 
 %% Load Files
@@ -158,29 +163,33 @@ for iSweep = 1:nSweeps
         data.peak_height_raw(iSweep, 1:nPeaks) = peakHeightTemp(1:nPeaks);
     end
     
-    % Figure out where to end the gaussian fit (when the peak first drops
-    % below a threshold value mV
-    data.edge_fit(iSweep) = find(...
-        data.data_sweeps(data.edges_area(1):end, iSweep) < ...
-        data.thresh_end_gauss, 1, 'first');
+    if doFit
     
-    % Fit a sum of 3 gaussians to the curve
-    idxToUseFit = (1:data.edge_fit) + data.edges_area(1) - 1;
-    [data.fit_object{iSweep}, gof] = fit(...
-        data.tt(idxToUseFit), data.data_sweeps(idxToUseFit, iSweep), ...
-        modelName, fitOptions);
-    
-    % Extract information from the gaussian fit
-    data.peak_time_fit(iSweep, :) = [data.fit_object{iSweep}.b1, ...
-        data.fit_object{iSweep}.b2, data.fit_object{iSweep}.b3];
-    data.peak_height_fit(iSweep, :) = [data.fit_object{iSweep}.a1, ...
-        data.fit_object{iSweep}.a2, data.fit_object{iSweep}.a3];
-    data.peak_width_fit(iSweep, :) = abs([data.fit_object{iSweep}.c1, ...
-        data.fit_object{iSweep}.c2, data.fit_object{iSweep}.c3]);
-    data.peak_area_fit(iSweep, :) = data.peak_width_fit(iSweep, :).* ...
-        data.peak_height_fit(iSweep, :).*sqrt(2*pi);
-    data.fit_rsquared_adj(iSweep) = gof.adjrsquare;
-    data.fit_rmse(iSweep) = gof.rmse;
+        % Figure out where to end the gaussian fit (when the peak first 
+        % drops below a threshold value mV
+        data.edge_fit(iSweep) = find(...
+            data.data_sweeps(data.edges_area(1):end, iSweep) < ...
+            data.thresh_end_gauss, 1, 'first');
+
+        % Fit a sum of 3 gaussians to the curve
+        idxToUseFit = (1:data.edge_fit) + data.edges_area(1) - 1;
+        [data.fit_object{iSweep}, gof] = fit(...
+            data.tt(idxToUseFit), data.data_sweeps(idxToUseFit, iSweep), ...
+            modelName, fitOptions);
+
+        % Extract information from the gaussian fit
+        data.peak_time_fit(iSweep, :) = [data.fit_object{iSweep}.b1, ...
+            data.fit_object{iSweep}.b2, data.fit_object{iSweep}.b3];
+        data.peak_height_fit(iSweep, :) = [data.fit_object{iSweep}.a1, ...
+            data.fit_object{iSweep}.a2, data.fit_object{iSweep}.a3];
+        data.peak_width_fit(iSweep, :) = abs([data.fit_object{iSweep}.c1, ...
+            data.fit_object{iSweep}.c2, data.fit_object{iSweep}.c3]);
+        data.peak_area_fit(iSweep, :) = data.peak_width_fit(iSweep, :).* ...
+            data.peak_height_fit(iSweep, :).*sqrt(2*pi);
+        data.fit_rsquared_adj(iSweep) = gof.adjrsquare;
+        data.fit_rmse(iSweep) = gof.rmse;
+        
+    end
     
 end
 
