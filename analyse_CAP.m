@@ -1,4 +1,5 @@
-function data = analyse_CAP(dirData, fnMCD, pathDLL, chToLoad, varargin)
+function [data, dataNorm] = analyse_CAP(dirData, fnMCD, pathDLL, ...
+    chToLoad, varargin)
 
 % Requires the Neuroshare Library, which can be downloaded from:
 %   http://www.multichannelsystems.com/downloads/software
@@ -20,18 +21,23 @@ if nargin > 5
 end
 
 doFit = false;
-if nargin > 6
+if nargin > 6 && ~isempty(varargin{3})
     doFit = varargin{3};
 end
 
 data.min_prominence = 0.25;
-if nargin > 7
+if nargin > 7 && ~isempty(varargin{4})
     data.min_prominence = varargin{4};
 end
 
 data.thresh_end_gauss = 1;
-if nargin > 8
+if nargin > 8 && ~isempty(varargin{5})
     data.thresh_end_gauss = varargin{5};
+end
+
+idxsNorm = 1;
+if nargin > 9 && ~isempty(varargin{6})
+    idxsNorm = varargin{6};
 end
 
 %% Load Files
@@ -96,6 +102,10 @@ end
 
 %% Perform the calculations
 
+% Save the filename
+
+data.filename = fnMCD;
+
 % Calculate the time vector for each sweep, multiplying by 10^3 to make 
 % the numbers nicer
 nDataPoints = size(dataSweepsRaw, 1);
@@ -120,6 +130,11 @@ if isempty(data.edges_area)
 end
 idxToUseArea = data.edges_area(1):data.edges_area(2);
 
+% Find edges where to calculate area
+data.edges_area_partial = crop_gui(data.tt, data.data_sweeps, ...
+    'PARTIAL AREA');
+idxToUseAreaPartial = data.edges_area_partial(1):data.edges_area_partial(2);
+
 % Find edges where to calculate the peak maximum's
 data.edges_peak(1, :) = crop_gui(data.tt, data.data_sweeps, 'PEAK 1');
 idxToUsePeak1 = data.edges_peak(1, 1):data.edges_peak(1, 2);
@@ -134,6 +149,7 @@ modelName = 'gauss3';
 
 % Preallocate memory for variables
 data.area_CAP = zeros(nSweeps, 1);
+data.area_CAP_partial = data.area_CAP;
 data.peak_time_raw = zeros(nSweeps, 2);
 data.peak_height_raw = data.peak_time_raw;
 data.edge_fit = data.area_CAP;
@@ -154,24 +170,13 @@ for iSweep = 1:nSweeps
     data.area_CAP(iSweep) = trapz(data.tt(idxToUseArea), ...
         abs(data.data_sweeps(idxToUseArea, iSweep)));
     
-    if doFit
+    % Take the partial CAP area as specified by the user
+    data.area_CAP_partial(iSweep) = trapz(data.tt(idxToUseAreaPartial), ...
+        abs(data.data_sweeps(idxToUseAreaPartial, iSweep)));
     
-%         % Find the 'raw' peaks for each CAP
-%         [peakHeightTemp, peakLocsRaw] = findpeaks(...
-%             data.data_sweeps(idxToUseArea, iSweep), ...
-%             'MinPeakProminence', data.min_prominence);
-%         nPeaks = length(peakLocsRaw);
-%         if nPeaks > 0
-%             nPeaks = min([nPeaks, 2]);
-%             peakLocsAdj = data.edges_area(1) + peakLocsRaw - 1;
-%             data.peak_time_raw(iSweep, 1:nPeaks) = ...
-%                 data.tt(peakLocsAdj(1:nPeaks));
-%             data.peak_height_raw(iSweep, 1:nPeaks) = peakHeightTemp(1:nPeaks);
-%         else
-%             warning('AnalyseCAP:NoPeaks', ['No peaks found in sweep %d :-( . ' ...
-%                 'This may influence the fitting process.'], iSweep)
-%         end
-
+    if doFit
+        
+        %
         [data.peak_height_raw(iSweep, 1), peakLocsRaw(1)] = max(...
             data.data_sweeps(idxToUsePeak1, iSweep));
         [data.peak_height_raw(iSweep, 2), peakLocsRaw(2)] = max(...
@@ -237,6 +242,9 @@ for iSweep = 1:nSweeps
     
 end
 
+% Also create a normalised structure containing the same information
+dataNorm = normalise_data(data, idxsNorm);
+
 %% Prepare the outputs
 
 % Sort the structure fields into alphabetical order
@@ -250,36 +258,18 @@ delimiter = ',';
 fnData = fullfile(dirData, [fnMCD_stripped, '_data']);
 save(fnData, 'data')
 
-% Prepare some data/formatting parameters for writing the summary data
+% Prepare some parameters for writing the summary data
 fnFullCSV_summary = fullfile(dirData, [fnMCD_stripped, '_summary.csv']);
-hdrNames = {'Sweep_Time', 'Baseline', 'CAP_Area', 'Peak_Time_1_Raw', ...
-    'Peak_Time_2_Raw', 'Peak_Height_1_Raw', 'Peak_Height_2_Raw', ...
-    'Peak_Time_1_Fit', 'Peak_Time_2_Fit', ...
-    'Peak_Time_3_Fit', 'Peak_Height_1_Fit', 'Peak_Height_2_Fit', ...
-    'Peak_Height_3_Fit', 'Peak_Width_1_Fit', 'Peak_Width_2_Fit', ...
-    'Peak_Width_3_Fit', 'Peak_Area_1_Fit', 'Peak_Area_2_Fit', ...
-    'Peak_Area_3_Fit', 'Fit_Edge', 'Fit_RSquared_Adj', 'Fit_RMSE'};
-hdrStrSummary = sprintf(['%s' delimiter], hdrNames{:});
-strEdgesBL = sprintf(['Edge_Idx_Baseline' delimiter '%d', ...
-    delimiter, '%d'], data.edges_baseline(1), data.edges_baseline(2));
-strEdgesArea = sprintf(['Edge_Idx_Area' delimiter '%d', ...
-    delimiter, '%d'], data.edges_area(1), data.edges_area(2));
-dataMat = [data.time_sweeps, data.baseline, data.area_CAP, ...
-    data.peak_time_raw, data.peak_height_raw, data.peak_time_fit, ...
-    data.peak_height_fit, data.peak_width_fit, data.peak_area_fit, ...
-    data.edge_fit, data.fit_rsquared_adj, data.fit_rmse];
+output_data_csv(fnFullCSV_summary, data, delimiter)
 
-% Prepare some data/formatting parameters for writing the summary data
+% Prepare some parameters for writing the normalised summary data
+fnFullCSV_summary_norm = fullfile(dirData, [fnMCD_stripped, ...
+    '_summary_norm.csv']);
+output_data_csv(fnFullCSV_summary_norm, dataNorm, delimiter)
+
+% Prepare some data/formatting parameters for writing the raw traces
 hdrStrRaw = ['time' delimiter sprintf(['sweep_%d' delimiter], 1:nSweeps)];
 fnFullCSV_raw = fullfile(dirData, [fnMCD_stripped, '_sweeps.csv']);
-
-% Write the summary data to a csv file
-dlmwrite(fnFullCSV_summary, strEdgesBL, 'delimiter', '');
-dlmwrite(fnFullCSV_summary, strEdgesArea, '-append', 'delimiter', '');
-dlmwrite(fnFullCSV_summary, hdrStrSummary(1:end-1), '-append', ...
-    'delimiter', '');
-dlmwrite(fnFullCSV_summary, dataMat, '-append', 'delimiter', delimiter, ...
-    'precision', '%.5f');
 
 % Write the raw traces data to a csv file
 dlmwrite(fnFullCSV_raw, hdrStrRaw(1:end-1), 'delimiter', '');
