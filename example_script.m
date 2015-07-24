@@ -89,6 +89,15 @@ fnFull_plot_norm = fullfile(dirData_HFS2, ...
     [fnMCD_HFS2(1:end-4) '_summary_norm']);
 plot_summary(dataCAP_HFS2_norm, fnFull_plot_norm)
 
+% Produce summary plots with xlims
+xLims = [9 14];
+fnFull_plot_zoom = fullfile(dirData_HFS2, ...
+    [fnMCD_HFS2(1:end-4) '_summary_zoom']);
+plot_summary(dataCAP_HFS2, fnFull_plot_zoom, xLims)
+fnFull_plot_norm_zoom = fullfile(dirData_HFS2, ...
+    [fnMCD_HFS2(1:end-4) '_summary_norm_zoom']);
+plot_summary(dataCAP_HFS2_norm, fnFull_plot_norm_zoom, xLims)
+
 % Plot the gaussian fit
-nSweep = 50;
+nSweep = 170;
 plot_gauss(dataCAP_HFS2, nSweep)

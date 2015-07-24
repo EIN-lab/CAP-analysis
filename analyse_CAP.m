@@ -191,10 +191,24 @@ for iSweep = 1:nSweeps
         if hasPeak2
             idxPeakStart = peakLocsAdj(2);
         else
-            idxPeakStart = find(data.tt > 2.5, 1,  'first');
+            tPeak2Sub = 2.5;
+            warning('AnalyseCAP:NoPeak2Found', ['Did not find peak 2 in ' ...
+                'sweep %d.  The algorithm will look for the first point ' ...
+                'after %3.2f seconds that drops below the threshold'], ...
+                iSweep, tPeak2Sub)
+            idxPeakStart = find(data.tt > tPeak2Sub, 1,  'first');
         end
         idxGaussEndRaw = find(data.data_sweeps(idxPeakStart:end, iSweep) < ...
             data.thresh_end_gauss, 1, 'first');
+        hasNoEnd = isempty(idxGaussEndRaw);
+        if hasNoEnd
+            warning('AnalyseCAP:NoThreshPointFound', ['Did not find ' ...
+                'any points after %3.2f s below the threshold ' ...
+                '(%3.2fmV) in sweep %d.  The algorithm will end the ' ...
+                'fitting where the CAP area calculation ends.'], ...
+                idxPeakStart, data.thresh_end_gauss, iSweep)
+            idxGaussEndRaw = data.edges_area(2);
+        end
         idxGaussEnd = idxGaussEndRaw + idxPeakStart - 1;
         
         % Check that we have enough points
@@ -242,13 +256,15 @@ for iSweep = 1:nSweeps
     
 end
 
+data.area_CAP_fit = sum(data.peak_area_fit, 2);
+
+% Sort the structure fields into alphabetical order
+data = orderfields(data);
+
 % Also create a normalised structure containing the same information
 dataNorm = normalise_data(data, idxsNorm);
 
 %% Prepare the outputs
-
-% Sort the structure fields into alphabetical order
-data = orderfields(data);
 
 % Prepare some data/formatting parameters for writing the data
 delimiter = ',';

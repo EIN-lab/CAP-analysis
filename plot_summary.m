@@ -1,4 +1,13 @@
-function varargout = plot_summary(data, fnFull_plot)
+function varargout = plot_summary(data, fnFull_plot, varargin)
+
+time_sweeps = data.time_sweeps/60;
+
+hasLims = (nargin > 2) && ~isempty(varargin{1});
+if hasLims
+    xLims = varargin{1};
+else
+    xLims = [min(time_sweeps), max(time_sweeps)];
+end
 
 colOrder = get(groot,'DefaultAxesColorOrder');
 
@@ -7,26 +16,37 @@ propsAxes = {'FontSize', 12};
 nRows = 6;
 nCols = 1;
 
-time_sweeps = data.time_sweeps/60;
-xLims = [min(time_sweeps), max(time_sweeps)];
+
 
 hFig = figure;
 if nargout > 0
     varargout{1} = hFig;
 end
 
+% Make a title, depending on if the data is normalised or not
+isNormalised = isfield(data, 'idxsNorm');
+if isNormalised
+    strTitle = sprintf('%s (Normalised between sweeps %d and %d)', ...
+        data.filename, data.idxsNorm(1), data.idxsNorm(end));
+else
+    strTitle = data.filename;
+end
+
 subplot(nRows, nCols, 1, propsAxes{:}), hold on
-plot(time_sweeps, data.area_CAP, 'Color', 'k', ...
-    'DisplayName', sprintf('Sweeps %d to %d', data.edges_area))
+plot(time_sweeps, data.area_CAP, 'Color', 'k', 'DisplayName', 'Raw')
+plot(time_sweeps, data.area_CAP_fit, 'k--', 'DisplayName', 'Fit')
+plot(0, 0, 'w', 'DisplayName', sprintf('Boundaries:\n%3.2f to %3.2f ms', ...
+    data.tt(data.edges_area)))
 xlim(xLims)
-title(data.filename, 'Interpreter', 'none')
+title(strTitle, 'Interpreter', 'none')
 ylabel('CAP Area') % (incl edges)
 legend('Show'), legend('boxoff')
 hold off
 
 subplot(nRows, nCols, 2, propsAxes{:}), hold on
-plot(time_sweeps, data.area_CAP_partial, 'Color', 'k', ...
-    'DisplayName', sprintf('Sweeps %d to %d', data.edges_area_partial))
+plot(time_sweeps, data.area_CAP_partial, 'Color', 'k', 'DisplayName', 'Raw')
+plot(0, 0, 'w', 'DisplayName', sprintf('Boundaries:\n%3.2f to %3.2f ms', ...
+    data.tt(data.edges_area_partial)))
 xlim(xLims)
 ylabel('Partial CAP Area') % (incl edges)
 legend('Show'), legend('boxoff')

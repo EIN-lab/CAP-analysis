@@ -36,4 +36,8 @@ for iField = 1:nFields
     
 end
 
+% Store a record of the normalisation, and re-order the fields for tidyness
+dataNorm.idxsNorm = idxsNorm;
+dataNorm = orderfields(dataNorm);
+
 end
