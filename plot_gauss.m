@@ -12,11 +12,12 @@ vv_fit(:,2) = funGauss(data.fit_object{nSweep}.a2, ...
 vv_fit(:,3) = funGauss(data.fit_object{nSweep}.a3, ...
     data.fit_object{nSweep}.b3, data.fit_object{nSweep}.c3);
 
-hFig = figure;
-axes('FontSize', 12)
-if nargout > 0
-    varargout{1} = hFig;
-end
+% hFig = figure;
+% axes('FontSize', 12)
+%if nargout > 0
+%    varargout{1} = hFig;
+% end
+varargout{1} = [];
 
 yMax = max(data.data_sweeps(:, nSweep));
 yMin = min(data.data_sweeps(:, nSweep));
