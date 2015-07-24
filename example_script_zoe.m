@@ -66,10 +66,10 @@ dataCAP_HFS = analyse_CAP(dirData_HFS, fnMCD_HFS, ...
 %% HFS protocol example 2
 
 % Specify the filenames of the MCD files
-fnMCD_HFS2 = '2015_07_23_N3220_HFS0001.mcd';
+fnMCD_HFS2 = '2015_07_23_N1918_HFS0001.mcd';
 
 % Specify the directory of the MCD files
-dirData_HFS2 = '/Users/zoelooser/Desktop/Blub';
+dirData_HFS2 = '/Users/zoelooser/Desktop/Weber_Lab/DATA HFS/THYATP/2015_07_23_N1918';
 
 % Specify which of the 'segment' channels to load
 chToLoad_HFS2 = 10;
