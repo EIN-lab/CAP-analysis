@@ -36,7 +36,7 @@ plot(tt_close, vv_fit, '--', 'Color', colOrder(2, :))
 ylim(yLims)
 xlabel('Time [ms]')
 ylabel('Voltage [mV]')
-legend('Maximum in Raw Data', 'Maximum in Gaussian Fit'), legend('boxoff')   % by Zoe
+legend('Raw Data', 'Gaussian Fit'), legend('boxoff')
 hold off
 
 end
