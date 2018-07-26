@@ -14,7 +14,7 @@ if nargin > 4
 end
 
 % This optional argument specifies the edges (i.e. indices) of the array to
-% use for calculating the CAP area
+% use for calculating the total CAP and partial CAP area
 data.edges_area = [];
 if nargin > 5
     data.edges_area = varargin{2};
@@ -39,7 +39,18 @@ idxsNorm = 1;
 if nargin > 9 && ~isempty(varargin{6})
     idxsNorm = varargin{6};
 end
+ 
+data.edges_area_partial = [];
+if nargin > 10 && ~isempty(varargin{7})
+    data.edges_area_partial = varargin{7};
+end
 
+% This optional argument specifies the edges (i.e. indices) of the array to
+% find maximal peak amplitudes
+data.edges_peak = [];
+if nargin > 11 && ~isempty(varargin{8})
+    data.edges_peak = varargin{8};
+end
 %% Load Files
 
 % Add the NeuroShare directory to the path, if necessary
@@ -130,16 +141,33 @@ if isempty(data.edges_area)
 end
 idxToUseArea = data.edges_area(1):data.edges_area(2);
 
-% Find edges where to calculate area
-data.edges_area_partial = crop_gui(data.tt, data.data_sweeps, ...
+% Find edges where to calculate partial area
+if isempty(data.edges_area_partial)
+    data.edges_area_partial = crop_gui(data.tt, data.data_sweeps, ...
     'PARTIAL AREA');
+end
 idxToUseAreaPartial = data.edges_area_partial(1):data.edges_area_partial(2);
 
-% Find edges where to calculate the peak maximum's
-data.edges_peak(1, :) = crop_gui(data.tt, data.data_sweeps, 'PEAK 1');
+%This part can be inserted if we want to have a fixed length of the partial
+%CAP area interval. as e.g. 1ms:
+
+% intervalLength = 1; %ms
+% idxToUseAreaPartial = data.edges_area_partial(1) : ...
+%     data.edges_area_partial(1) + ...
+%     round(intervalLength / (FileInfo.TimeStampResolution/1E-3));
+
+
+% Find edges where to calculate the peak maxima of peak 1 and peak 2
+if isempty(data.edges_peak)
+    data.edges_peak(1, :) = crop_gui(data.tt, data.data_sweeps, 'PEAK 1');
+end
 idxToUsePeak1 = data.edges_peak(1, 1):data.edges_peak(1, 2);
-data.edges_peak(2, :) = crop_gui(data.tt, data.data_sweeps, 'PEAK 2');
+
+if size(data.edges_peak, 1) < 2
+    data.edges_peak(2, :) = crop_gui(data.tt, data.data_sweeps, 'PEAK 2');
+end
 idxToUsePeak2 = data.edges_peak(2, 1):data.edges_peak(2, 2);
+
 adjFactor = [data.edges_peak(1, 1), data.edges_peak(2, 1)] - 1;
 
 % Set up initial guesses for the gaussian peak fitting
@@ -174,9 +202,7 @@ for iSweep = 1:nSweeps
     data.area_CAP_partial(iSweep) = trapz(data.tt(idxToUseAreaPartial), ...
         abs(data.data_sweeps(idxToUseAreaPartial, iSweep)));
     
-    if doFit
-        
-        %
+            %
         [data.peak_height_raw(iSweep, 1), peakLocsRaw(1)] = max(...
             data.data_sweeps(idxToUsePeak1, iSweep));
         [data.peak_height_raw(iSweep, 2), peakLocsRaw(2)] = max(...
@@ -184,6 +210,9 @@ for iSweep = 1:nSweeps
         
         peakLocsAdj = peakLocsRaw + adjFactor;
         data.peak_time_raw(iSweep, :) = data.tt(peakLocsAdj);
+        
+    if doFit
+        
     
         % Figure out where to end the gaussian fit (when the peak first 
         % drops below a threshold value mV
