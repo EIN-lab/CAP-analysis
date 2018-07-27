@@ -28,15 +28,14 @@
 %% Configure analysis
 
 % Specify the path to the DLL (Neuroshare library)
-pathDLL = ['/Users/zoelooser/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
-    'Matlab/Matlab-Import-Filter/Matlab_Interface/nsMCDLibrary.dylib'];
-% pathDLL = ['/Users/%username%/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
-%    'Matlab/Matlab-Import-Filter/Matlab_Interface/nsMCDLibrary.dylib'];
+pathDLL = ['/Users/%username%/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
+   'Matlab/Matlab-Import-Filter/Matlab_Interface/nsMCDLibrary.dylib'];
+
 % Specify the filenames of the MCD file
 fnMCD_exp = 'example_Ramp_1_10_25_50Hz.mcd';
 
 % Specify the directory of the MCD file
-dirData_exp = '/Users/zoelooser/Documents/MATLAB/CAP-analysis Frontiers/Example CAP recording';
+dirData_exp = '/Users/%username%/Documents/MATLAB/CAP-analysis Frontiers/Example CAP recording';
 
 % Specify which of the 'segment' channels to load and analyze
 chToLoad_exp = 10;
