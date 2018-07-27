@@ -27,11 +27,22 @@
 
 %% Configure analysis
 
-% Specify the path to the DLL (Neuroshare library)
-pathDLL = ['/Users/zoelooser/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
-    'Matlab/Matlab-Import-Filter/Matlab_Interface/nsMCDLibrary.dylib'];
+% Prompt user for the path to the DLL (Neuroshare library)
+fprintf('Please select the neuroshare library DLL file\n');
+[filename, pathname] = uigetfile('*.dylib', ['Pick the Neuroshare', ...
+    'library DLL file']);
+if isequal(filename,0) || isequal(pathname,0)
+    error(['Please install and select neuroshare library. The library', ...
+    ' can be downloaded from ', ...
+    'https://www.multichannelsystems.com/software/neuroshare-library']) 
+else
+    pathDLL = fullfile(pathname, filename);
+end
+
+% Or specify path programmatically
 % pathDLL = ['/Users/%username%/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
 %    'Matlab/Matlab-Import-Filter/Matlab_Interface/nsMCDLibrary.dylib'];
+
 % Specify the filenames of the MCD file
 fnMCD_exp = 'example_Ramp_1_10_25_50Hz.mcd';
 
