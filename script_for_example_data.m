@@ -22,7 +22,7 @@
 %  https://www.multichannelsystems.com/software/neuroshare-library
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%% Example script for CAP analysis %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Example script for CAP analysis of example data %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Configure analysis
