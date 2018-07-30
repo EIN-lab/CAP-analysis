@@ -35,7 +35,7 @@ pathDLL = ['/Users/%username%/Documents/MATLAB/nsMCDLibrary_MacOSX_3.7b/'...
 fnMCD_exp = 'example_Ramp_1_10_25_50Hz.mcd';
 
 % Specify the directory of the MCD file
-dirData_exp = '/Users/%username%/Documents/MATLAB/CAP-analysis Frontiers/Example CAP recording';
+dirData_exp = '/Users/%username%/Documents/MATLAB/CAP-analysis/Example CAP recording';
 
 % Specify which of the 'segment' channels to load and analyze
 chToLoad_exp = 10;
