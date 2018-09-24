@@ -1,9 +1,26 @@
+%   Copyright (C) 2018  Zoe J. Looser et al.
+%
+%   This program is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   This program is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% ======================================================================= %
+
 %% Analysis of MC_rack data (MCD files)
 
 % Input: Filename and path to MCD file
 % Output: Saved to directory of the MCD files:
     % 1) Summary data raw and normalized (csv)
-    %    (normalization to the defined baseline => idxsNorm)  
+    %    (normalization to the defined baseline => idxsNorm)
     % 2) Data and parameters as matlab file (mat)
     % 3) Summary plots and plot of CAP sweeps (pdf)
 
@@ -13,7 +30,7 @@
 
 % Comment 2: Gaussian fit
 % The Gaussian fit determines the three gaussian distributions that sum up
-% to best fit the total CAP area (error functions R2 and RMSE, included in 
+% to best fit the total CAP area (error functions R2 and RMSE, included in
 % summary output data).
 % This is helpfull to follow changes in peak 3 which cannot always be
 % defined as a maximum.
@@ -34,7 +51,7 @@ fprintf('Please select the neuroshare library DLL file\n');
 if isequal(filename,0) || isequal(pathname,0)
     error(['Please install and select neuroshare library. The library', ...
     ' can be downloaded from ', ...
-    'https://www.multichannelsystems.com/software/neuroshare-library']) 
+    'https://www.multichannelsystems.com/software/neuroshare-library'])
 else
     pathDLL = fullfile(pathname, filename);
 end
@@ -56,16 +73,14 @@ chToLoad_exp = 10;
 % (example data: 1 min baseline sampled at 0.4 Hz)
 idxsNorm = 1:24;
 
-% Call the function to analyse the data sets, choose if you want to do
-% gaussian fitting (doFit true or false).
-% threshold for gaussian fitting => adjustments to improve fitting.
 doFit = false;
+
+% Threshold for gaussian fitting. Adjust to improve fitting.
 threshGauss = 1.8;
 
-
 %% Run Analysis, Manual selection of boundaries
-% Baseline, CAP, partial CAP and peak identification from direct user input
 
+% Baseline, CAP, partial CAP and peak identification from direct user input
 [dataCAP_exp, dataCAP_exp_norm] = analyse_CAP(dirData_exp, ...
     fnMCD_exp, pathDLL, chToLoad_exp, [], [], doFit, ...
     [], threshGauss, idxsNorm);

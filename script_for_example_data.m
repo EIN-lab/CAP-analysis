@@ -1,9 +1,26 @@
+%   Copyright (C) 2018  Zoe J. Looser et al.
+%
+%   This program is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   This program is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% ======================================================================= %
+
 %% Analysis of MC_rack data (MCD files)
 
 % Input: Filename and path to MCD file
 % Output: Saved to directory of the MCD files:
     % 1) Summary data raw and normalized (csv)
-    %    (normalization to the defined baseline => idxsNorm)  
+    %    (normalization to the defined baseline => idxsNorm)
     % 2) Data and parameters as matlab file (mat)
     % 3) Summary plots and plot of CAP sweeps (pdf)
 
@@ -13,7 +30,7 @@
 
 % Comment 2: Gaussian fit
 % The Gaussian fit determines the three gaussian distributions that sum up
-% to best fit the total CAP area (error functions R2 and RMSE, included in 
+% to best fit the total CAP area (error functions R2 and RMSE, included in
 % summary output data).
 % This is helpfull to follow changes in peak 3 which cannot always be
 % defined as a maximum.
@@ -89,13 +106,13 @@ title([fnMCD_exp(1:end-4) ' Gaussian fits under different stimulations'], 'Inter
 
 nPlots = numel(listOfSweeps);
 for iPlot = 1:nPlots
-  
+
     nSweep = listOfSweeps(iPlot);
     subplot(4,2,iPlot)
     plot_gauss(dataCAP_exp, nSweep);
     title(listOfTitles{iPlot})
     axis([1,8,-1,8])
-    
+
 end
 
 hold off

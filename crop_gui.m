@@ -1,3 +1,20 @@
+%   Copyright (C) 2018  Zoe J. Looser et al.
+%
+%   This program is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   This program is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% ======================================================================= %
+
 function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
 
     % Specify how many points to choose
@@ -5,7 +22,7 @@ function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
     if nargin > 3
         nPoints = varargin{1};
     end
-    
+
     strLRTB = 'LEFT and RIGHT';
     if nargin > 4
         strLRTB =  varargin{2};
@@ -16,10 +33,10 @@ function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
         strLRTB, strBoundary);
     strMsg = 'Click outside the image to use all the way to that edge.';
     strFigTitle = sprintf('%s\n%s', strFigTitleTop, strMsg);
-    
+
     % Work out the data spacing
     ttSpacing = mean(tt(2:end) - tt(1:end-1));
-    
+
     % Create the figure
     hFig = figure;
     yLims = plot_traces(tt, vv);
@@ -44,7 +61,7 @@ function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
         elseif outsideImageLeft
             x(iPoint) = min(tt);
         end
-        
+
         % Find the index of the point we picked
         idxToUse(iPoint) = round(x(iPoint)/ttSpacing) + 1;
 
@@ -62,5 +79,5 @@ function idxToUse = crop_gui(tt, vv, strBoundary, varargin)
 
     % Sort and return the points
     idxToUse = sort(idxToUse);
-    
+
 end

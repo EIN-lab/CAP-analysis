@@ -1,3 +1,20 @@
+%   Copyright (C) 2018  Zoe J. Looser et al.
+%
+%   This program is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   This program is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+% ======================================================================= %
+
 function [data, dataNorm] = analyse_CAP(dirData, fnMCD, pathDLL, ...
     chToLoad, varargin)
 
@@ -39,7 +56,7 @@ idxsNorm = 1;
 if nargin > 9 && ~isempty(varargin{6})
     idxsNorm = varargin{6};
 end
- 
+
 data.edges_area_partial = [];
 if nargin > 10 && ~isempty(varargin{7})
     data.edges_area_partial = varargin{7};
@@ -82,7 +99,7 @@ if (nsresult ~= 0)
     return
 end
 
-% Load Information of the different entities recorded (electrode, 
+% Load Information of the different entities recorded (electrode,
 % trigger, digital channel)
 [nsresult, EntityInfo]  = ns_GetEntityInfo(hfile, 1:1:FileInfo.EntityCount);
 if (nsresult ~= 0)
@@ -117,7 +134,7 @@ end
 
 data.filename = fnMCD;
 
-% Calculate the time vector for each sweep, multiplying by 10^3 to make 
+% Calculate the time vector for each sweep, multiplying by 10^3 to make
 % the numbers nicer
 nDataPoints = size(dataSweepsRaw, 1);
 data.tt = (0:nDataPoints-1)'.*FileInfo.TimeStampResolution/1E-3;
@@ -191,30 +208,30 @@ data.fit_object = cell(nSweeps, 1);
 
 % Loop through and calculate the required metrics
 for iSweep = 1:nSweeps
-    
+
     % Calculate the CAP area for each sweep, subtracting out the baseline,
     % and taking the absolute value to ensure negative areas are also
     % counted as positive
     data.area_CAP(iSweep) = trapz(data.tt(idxToUseArea), ...
         abs(data.data_sweeps(idxToUseArea, iSweep)));
-    
+
     % Take the partial CAP area as specified by the user
     data.area_CAP_partial(iSweep) = trapz(data.tt(idxToUseAreaPartial), ...
         abs(data.data_sweeps(idxToUseAreaPartial, iSweep)));
-    
+
             %
         [data.peak_height_raw(iSweep, 1), peakLocsRaw(1)] = max(...
             data.data_sweeps(idxToUsePeak1, iSweep));
         [data.peak_height_raw(iSweep, 2), peakLocsRaw(2)] = max(...
             data.data_sweeps(idxToUsePeak2, iSweep));
-        
+
         peakLocsAdj = peakLocsRaw + adjFactor;
         data.peak_time_raw(iSweep, :) = data.tt(peakLocsAdj);
-        
+
     if doFit
-        
-    
-        % Figure out where to end the gaussian fit (when the peak first 
+
+
+        % Figure out where to end the gaussian fit (when the peak first
         % drops below a threshold value mV
         hasPeak2 = data.peak_time_raw(iSweep, 2) > 0;
         if hasPeak2
@@ -239,7 +256,7 @@ for iSweep = 1:nSweeps
             idxGaussEndRaw = data.edges_area(2) - idxPeakStart;
         end
         idxGaussEnd = idxGaussEndRaw + idxPeakStart - 1;
-        
+
         % Check that we have enough points
         minNPoints = 30;
         hasEnoughPoints = idxGaussEnd > minNPoints;
@@ -249,12 +266,12 @@ for iSweep = 1:nSweeps
                 'weird is probably happening.  Try looking at the ' ...
                 'traces, or else see Matt.'], minNPoints)
         end
-        
+
         % Calculate some starting points for the fitting
         pp0([1,4,7]) = [[0.2, 0.7].*data.peak_height_raw(iSweep, :), 2]; % estimated peak heights
         pp0([2,5,8]) = [data.peak_time_raw(iSweep, :), 3.4]; % estimated peak latencies
         fitOptions = fitoptions(modelName, 'StartPoint', pp0);
-        
+
         % Fit a sum of 3 gaussians to the curve
         idxToUseFit = data.edges_area(1):idxGaussEnd;
         data.edge_fit(iSweep) = idxToUseFit(end);
@@ -273,16 +290,16 @@ for iSweep = 1:nSweeps
             data.peak_height_fit(iSweep, :).*sqrt(2*pi);
         data.fit_rsquared_adj(iSweep) = gof.adjrsquare;
         data.fit_rmse(iSweep) = gof.rmse;
-        
+
         % For debugging only
 %         figure, hold on
 %         plot(data.tt, data.data_sweeps(:, 1))
 %         plot(data.fit_object{1})
 %         plot(data.edge_fit(iSweep).*ones(1, 2), [])
 %         hold off
-        
+
     end
-    
+
 end
 
 data.area_CAP_fit = sum(data.peak_area_fit, 2);
