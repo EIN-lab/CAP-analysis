@@ -73,6 +73,7 @@ chToLoad_exp = 10;
 % (example data: 1 min baseline sampled at 0.4 Hz)
 idxsNorm = 1:24;
 
+% Choose if you want to do gaussian fitting (doFit true or false).
 doFit = false;
 
 % Threshold for gaussian fitting. Adjust to improve fitting.
